@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main_lavender_gradient">
+
+    <!-- ==================== SCREEN 1: HOME & TRANSAKSI (KIRI DI GAMBAR) ==================== -->
+    <LinearLayout
+        android:id="@+id/layoutTabTransaksi"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <!-- Top Bar: Settings Circle | Date Pill | Bell Circle -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/btnKelolaPengguna"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_circle_button"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:text="⚙️"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTanggalHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_date_pill"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="5dp"
+                    android:text="📅 Jum, 23 Okt"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvNamaPenggunaHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Pengguna Utama"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnNotifikasiHeader"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_white_circle_button"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:text="🔔"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Hero Section: This Month Spend -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pengeluaran Bulan Ini"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvPengeluaranBulanIniHero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Rp 1.225.000"
+                android:textColor="@color/text_primary"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSubHeroPemasukan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="↘ Pemasukan: +Rp 8.000.000 • Pengeluaran: -Rp 1.225.000"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Spending Wallet Card (Menghitung Saldo Otomatis) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSpendingWallet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/surface_card"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#FFF0F0F8"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_white_circle_button"
+                    android:backgroundTint="@color/primary_finance_light"
+                    android:gravity="center"
+                    android:text="👛"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Spending Wallet (Saldo Otomatis)"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvInfoSaldoAwal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Saldo Awal: Rp 1.500.000"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvTotalSaldoOtomatis"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rp 8.275.000"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="›"
+                    android:textColor="@color/text_muted"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Recent Transactions Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Recent Transactions"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSeeAllTransaksi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="See All"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Filter Bar (Semua / Pemasukan / Pengeluaran + Spinner Kategori) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="18dp"
+            android:paddingBottom="6dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterSemua"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="8dp"
+                android:text="Semua"
+                android:textAllCaps="false"
+                android:textSize="11sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterPemasukan"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="8dp"
+                android:text="Pemasukan"
+                android:textAllCaps="false"
+                android:textSize="11sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterPengeluaran"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="8dp"
+                android:text="Pengeluaran"
+                android:textAllCaps="false"
+                android:textSize="11sp" />
+
+            <Spinner
+                android:id="@+id/spinnerFilterKategori"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search_pill"
+                android:paddingHorizontal="6dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvEmptyTransaksi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="Belum ada transaksi.\nTekan tombol '+' di bawah untuk mencatat transaksi."
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTransaksi"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="96dp" />
+    </LinearLayout>
+
+    <!-- ==================== SCREEN 2: SELECT CATEGORY & KELOMPOK (TENGAH DI GAMBAR) ==================== -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/layoutTabKelompok"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header Select Category -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:id="@+id/btnBackDariKategori"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_white_circle_button"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:text="‹"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Select Category"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+            </LinearLayout>
+
+            <!-- Search for Categories Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_search_pill"
+                android:elevation="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etCariKategori"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:background="@null"
+                    android:hint="Search for Categories..."
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_muted"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Filter Tipe Kategori -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnKelompokSemua"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="Semua"
+                    android:textAllCaps="false"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnKelompokPengeluaran"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="Pengeluaran"
+                    android:textAllCaps="false"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnKelompokPemasukan"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="Pemasukan"
+                    android:textAllCaps="false"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Grid 4 Kolom Kategori (Persis Gambar Tengah) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvGridKategori"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="12dp" />
+
+            <!-- Ringkasan Pengelompokan Transaksi per Kategori -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="Pengelompokan Transaksi per Kategori"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyKelompok"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="Belum ada transaksi pada kelompok kategori ini."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvKelompokKategori"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ==================== SCREEN 3: ANALYTICS / LAPORAN BULANAN (KANAN DI GAMBAR) ==================== -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/layoutTabLaporan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header Analytics -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Analytics"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Kartu Grafik Bar Bulanan (Persis Gambar Kanan) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                app:cardBackgroundColor="@color/surface_card"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#FFF0F0F8"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Baris Atas Grafik: Pill Pemilih Bulan | Legend Income & Expense -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:background="@drawable/bg_monthly_dropdown_pill"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="6dp">
+
+                            <TextView
+                                android:id="@+id/btnBulanSebelumnya"
+                                android:layout_width="26dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="‹"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvPeriodeBulan"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="4dp"
+                                android:text="Oktober 2026"
+                                android:textColor="@color/text_primary"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/btnBulanBerikutnya"
+                                android:layout_width="26dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="›"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="●"
+                            android:textColor="@color/chart_purple_income"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="3dp"
+                            android:text="Income"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="●"
+                            android:textColor="@color/chart_mint_expense"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="3dp"
+                            android:text="Expense"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Grafik Batang 6 Bulan -->
+                    <com.example.aplikasipencatatankeuanganpribadi.ui.view.MonthlyBarChartView
+                        android:id="@+id/chartBulanan"
+                        android:layout_width="match_parent"
+                        android:layout_height="185dp"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Kartu Dual Income & Expenses (Persis di Bawah Grafik pada Gambar Kanan) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/surface_card"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#FFF0F0F8"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Kotak Income -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="4dp">
+
+                            <TextView
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_white_circle_button"
+                                android:backgroundTint="@color/primary_finance_light"
+                                android:gravity="center"
+                                android:text="🐷"
+                                android:textSize="17sp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLaporanPemasukan"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rp 8.000.000"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Income"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="36dp"
+                            android:layout_marginHorizontal="6dp"
+                            android:background="@color/divider_color" />
+
+                        <!-- Kotak Expenses -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="4dp">
+
+                            <TextView
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_white_circle_button"
+                                android:backgroundTint="@color/income_bg"
+                                android:gravity="center"
+                                android:text="🧾"
+                                android:textSize="17sp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLaporanPengeluaran"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rp 1.225.000"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Expenses"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="10dp"
+                        android:background="@color/divider_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvStatusArusKas"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Selisih Bulanan (Surplus)"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvLaporanSelisih"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+Rp 6.775.000"
+                                android:textColor="@color/primary_finance"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvRasioBulanan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rasio Keluar: 15%"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progressRasioBulanan"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="6dp"
+                        android:max="100"
+                        android:progress="15" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- History Section (Persis di Bawah Kartu pada Gambar Kanan) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:text="History &amp; Rincian Bulanan"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyLaporan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="Tidak ada transaksi pada bulan ini."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLaporanTransaksi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="4dp"
+                android:text="Pengelompokan Kategori Bulan Ini"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLaporanKategori"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ==================== BOTTOM BAR + FLOATING DARK NAVY '+' BUTTON ==================== -->
+    <FrameLayout
+        android:id="@+id/bottomBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@android:color/transparent">
+
+        <!-- Bar Putih di Bawah -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="22dp"
+            app:cardBackgroundColor="@color/surface_card"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:id="@+id/layoutBottomNavItems"
+                android:layout_width="match_parent"
+                android:layout_height="62dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Tab 1: Home -->
+                <LinearLayout
+                    android:id="@+id/navHome"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNavIconHome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🏠"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavLabelHome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Home"
+                        android:textColor="@color/primary_finance"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Tab 2: Category / Kelompok -->
+                <LinearLayout
+                    android:id="@+id/navKategori"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNavIconKategori"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🗂️"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavLabelKategori"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Category"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Ruang Tengah untuk Tombol '+' Bulat Navy -->
+                <View
+                    android:layout_width="68dp"
+                    android:layout_height="match_parent" />
+
+                <!-- Tab 3: Analytics / Laporan Bulanan -->
+                <LinearLayout
+                    android:id="@+id/navAnalytics"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNavIconAnalytics"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📊"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavLabelAnalytics"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Analytics"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Tab 4: Account / Pengguna -->
+                <LinearLayout
+                    android:id="@+id/navAccount"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNavIconAccount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👤"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavLabelAccount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Account"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tombol Bulat Dark Navy '+' di Tengah Bawah (Persis Gambar Referensi) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/fabCatatTransaksi"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="top|center_horizontal"
+            app:cardBackgroundColor="@color/navy_fab"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="＋"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</FrameLayout>

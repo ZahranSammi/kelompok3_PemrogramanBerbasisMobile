@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DompetKu - Pencatatan Keuangan</string>
+    <string name="tab_transaksi">Transaksi</string>
+    <string name="tab_kategori">Kelompok</string>
+    <string name="tab_laporan">Laporan Bulanan</string>
+    <string name="catat_transaksi">Catat Transaksi</string>
+</resources>

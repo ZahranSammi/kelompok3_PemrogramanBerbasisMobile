@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardGridKategori"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:cardBackgroundColor="@color/surface_card"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="2dp"
+        app:strokeColor="#FFF0F0F8"
+        app:strokeWidth="1dp">
+
+        <TextView
+            android:id="@+id/tvIkonGridKategori"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="🛍️"
+            android:textColor="@color/primary_finance"
+            android:textSize="24sp" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvNamaGridKategori"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="Belanja"
+        android:textColor="@color/text_primary"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSubGridKategori"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="Rp 480rb"
+        android:textColor="@color/text_secondary"
+        android:textSize="10sp" />
+</LinearLayout>

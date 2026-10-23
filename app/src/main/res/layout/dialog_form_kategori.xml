@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipe Kategori"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/rgTipeKategoriBaru"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbKategoriPengeluaran"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Pengeluaran"
+            android:textColor="@color/expense_red" />
+
+        <RadioButton
+            android:id="@+id/rbKategoriPemasukan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Pemasukan"
+            android:textColor="@color/income_green" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Nama Kategori"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etNamaKategoriBaru"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="Contoh: Langganan Streaming"
+        android:inputType="textCapWords"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Ikon Emoji (Opsional)"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etIkonKategoriBaru"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="Contoh: 📺 atau 💰"
+        android:inputType="text"
+        android:maxLength="4"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp" />
+</LinearLayout>
