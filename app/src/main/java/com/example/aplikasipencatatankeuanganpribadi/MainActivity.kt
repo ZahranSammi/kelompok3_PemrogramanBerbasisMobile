@@ -128,6 +128,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Proteksi privasi UI terhadap screen capture dan app switching preview (OWASP M6)
+        window.setFlags(
+            android.view.WindowManager.LayoutParams.FLAG_SECURE,
+            android.view.WindowManager.LayoutParams.FLAG_SECURE
+        )
         setContentView(R.layout.activity_main)
 
         dbHelper = DatabaseHelper(this)
@@ -347,7 +352,7 @@ class MainActivity : AppCompatActivity() {
         navHome.setOnClickListener { pindahKeTab(0) }
         navKategori.setOnClickListener { pindahKeTab(1) }
         navAnalytics.setOnClickListener { pindahKeTab(2) }
-        navAccount.setOnClickListener { tampilkanDialogKelolaPengguna() }
+        navAccount.setOnClickListener { verifikasiPinSebelumKelolaAkun { tampilkanDialogKelolaPengguna() } }
 
         btnBackDariKategori.setOnClickListener { pindahKeTab(0) }
 
@@ -419,9 +424,9 @@ class MainActivity : AppCompatActivity() {
             muatLaporanBulanan()
         }
 
-        // Kelola Pengguna & Dompet
-        btnKelolaPengguna.setOnClickListener { tampilkanDialogKelolaPengguna() }
-        cardSpendingWallet.setOnClickListener { tampilkanDialogKelolaPengguna() }
+        // Kelola Pengguna & Dompet dengan Verifikasi Keamanan (OWASP M3)
+        btnKelolaPengguna.setOnClickListener { verifikasiPinSebelumKelolaAkun { tampilkanDialogKelolaPengguna() } }
+        cardSpendingWallet.setOnClickListener { verifikasiPinSebelumKelolaAkun { tampilkanDialogKelolaPengguna() } }
         btnNotifikasiHeader.setOnClickListener {
             val saldo = dbHelper.hitungRingkasanSaldo(idPenggunaAktif)
             AlertDialog.Builder(this)
@@ -498,7 +503,7 @@ class MainActivity : AppCompatActivity() {
         tvTanggalHeader.text = "📅 ${FormatUtils.formatHeaderHariIni()}"
         val pengguna = dbHelper.getPenggunaById(idPenggunaAktif)
         if (pengguna != null) {
-            tvNamaPenggunaHeader.text = "${pengguna.namaPengguna} • ${pengguna.email}"
+            tvNamaPenggunaHeader.text = "${pengguna.namaPengguna} • ${FormatUtils.maskEmail(pengguna.email)}"
         }
 
         // Menghitung Saldo Otomatis
@@ -740,7 +745,7 @@ class MainActivity : AppCompatActivity() {
                     .ifBlank { kategoriTerpilih.namaKategori }
 
                 if (transaksiEdit == null) {
-                    dbHelper.tambahTransaksi(
+                    val idBaru = dbHelper.tambahTransaksi(
                         idPengguna = idPenggunaAktif,
                         idKategori = kategoriTerpilih.idKategori,
                         tipeTransaksi = tipe,
@@ -748,9 +753,19 @@ class MainActivity : AppCompatActivity() {
                         tanggal = tanggal,
                         keterangan = keterangan
                     )
-                    Toast.makeText(this, "Transaksi berhasil dicatat", Toast.LENGTH_SHORT).show()
+                    if (idBaru != -1L) {
+                        Toast.makeText(this, "Transaksi berhasil dicatat", Toast.LENGTH_SHORT).show()
+                        muatUlangSemuaData()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Gagal mencatat transaksi: periksa kembali nominal dan tanggal",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } else {
-                    dbHelper.updateTransaksi(
+                    val baris = dbHelper.updateTransaksi(
                         idTransaksi = transaksiEdit.idTransaksi,
                         idKategori = kategoriTerpilih.idKategori,
                         tipeTransaksi = tipe,
@@ -758,11 +773,18 @@ class MainActivity : AppCompatActivity() {
                         tanggal = tanggal,
                         keterangan = keterangan
                     )
-                    Toast.makeText(this, "Transaksi berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                    if (baris > 0) {
+                        Toast.makeText(this, "Transaksi berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                        muatUlangSemuaData()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Gagal memperbarui transaksi: periksa kembali nominal dan tanggal",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-
-                muatUlangSemuaData()
-                dialog.dismiss()
             }
         }
 
@@ -828,15 +850,81 @@ class MainActivity : AppCompatActivity() {
                 val warnaHex = if (tipe == TipeTransaksi.PEMASUKAN) "#8B5CF6" else "#10B981"
 
                 val idBaru = dbHelper.tambahKategori(nama, tipe, ikon, warnaHex)
-                muatFilterSpinnerKategori()
-                muatUlangSemuaData()
-                onSelesai?.invoke(idBaru)
-                Toast.makeText(this, "Kategori '$nama' ditambahkan", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                if (idBaru != -1L) {
+                    muatFilterSpinnerKategori()
+                    muatUlangSemuaData()
+                    onSelesai?.invoke(idBaru)
+                    Toast.makeText(this, "Kategori '$nama' ditambahkan", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(this, "Gagal menambahkan kategori: validasi data gagal", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         dialog.show()
+    }
+
+    // ==================== KEAMANAN & AUTENTIKASI AKSES (OWASP M3) ====================
+
+    private fun verifikasiPinSebelumKelolaAkun(onBerhasil: () -> Unit) {
+        val prefs = getSharedPreferences("keuangan_prefs", Context.MODE_PRIVATE)
+        val savedPin = prefs.getString("security_pin", null)
+        if (savedPin.isNullOrBlank()) {
+            onBerhasil()
+            return
+        }
+
+        val etPin = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            hint = "4-6 digit PIN"
+            gravity = android.view.Gravity.CENTER
+            setPadding(40, 40, 40, 40)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Verifikasi PIN Keamanan")
+            .setMessage("Masukkan PIN keamanan Anda untuk mengelola profil dan dompet:")
+            .setView(etPin)
+            .setPositiveButton("Buka") { _, _ ->
+                val input = etPin.text.toString().trim()
+                if (input == savedPin) {
+                    onBerhasil()
+                } else {
+                    Toast.makeText(this, "PIN salah! Akses ditolak.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun tampilkanDialogSetelPin() {
+        val prefs = getSharedPreferences("keuangan_prefs", Context.MODE_PRIVATE)
+        val etPin = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            hint = "4-6 digit angka (kosongkan untuk hapus PIN)"
+            gravity = android.view.Gravity.CENTER
+            setPadding(40, 40, 40, 40)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Setel PIN Keamanan")
+            .setMessage("Masukkan 4-6 digit angka untuk mengunci pengaturan profil (kosongkan jika ingin menonaktifkan PIN):")
+            .setView(etPin)
+            .setPositiveButton("Simpan PIN") { _, _ ->
+                val pinBaru = etPin.text.toString().trim()
+                if (pinBaru.isEmpty()) {
+                    prefs.edit().remove("security_pin").apply()
+                    Toast.makeText(this, "Kunci PIN dinonaktifkan", Toast.LENGTH_SHORT).show()
+                } else if (pinBaru.length in 4..6 && pinBaru.all { it.isDigit() }) {
+                    prefs.edit().putString("security_pin", pinBaru).apply()
+                    Toast.makeText(this, "PIN keamanan berhasil disimpan", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "PIN harus berupa 4 sampai 6 digit angka", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
     }
 
     // ==================== DIALOG KELOLA PENGGUNA ====================
@@ -849,6 +937,11 @@ class MainActivity : AppCompatActivity() {
         val etSaldoAwalPengguna = view.findViewById<EditText>(R.id.etSaldoAwalPengguna)
 
         val daftarPengguna = dbHelper.getSemuaPengguna().toMutableList()
+        if (daftarPengguna.isEmpty()) {
+            Toast.makeText(this, "Belum ada profil pengguna yang terdaftar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val labelPengguna = daftarPengguna.map { "${it.namaPengguna} (${it.email})" }
 
         val spinnerAdapter = ArrayAdapter(
@@ -898,7 +991,7 @@ class MainActivity : AppCompatActivity() {
             .setView(view)
             .setPositiveButton("Simpan & Aktifkan", null)
             .setNeutralButton("+ Pengguna Baru", null)
-            .setNegativeButton("Tutup", null)
+            .setNegativeButton("PIN / Tutup", null)
             .create()
 
         dialog.setOnShowListener {
@@ -912,7 +1005,7 @@ class MainActivity : AppCompatActivity() {
                     .ifBlank { "user@keuanganpribadi.id" }
                 val saldoAwal = etSaldoAwalPengguna.text.toString().trim().toDoubleOrNull() ?: 0.0
 
-                dbHelper.updatePengguna(
+                val baris = dbHelper.updatePengguna(
                     Pengguna(
                         idPengguna = penggunaTerpilih.idPengguna,
                         namaPengguna = nama,
@@ -920,10 +1013,14 @@ class MainActivity : AppCompatActivity() {
                         saldoAwal = saldoAwal
                     )
                 )
-                simpanPenggunaAktif(penggunaTerpilih.idPengguna)
-                muatUlangSemuaData()
-                Toast.makeText(this, "Pengguna '$nama' diaktifkan", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                if (baris > 0) {
+                    simpanPenggunaAktif(penggunaTerpilih.idPengguna)
+                    muatUlangSemuaData()
+                    Toast.makeText(this, "Pengguna '$nama' berhasil diaktifkan", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(this, "Gagal menyimpan: format email atau saldo tidak valid", Toast.LENGTH_SHORT).show()
+                }
             }
 
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
@@ -937,14 +1034,27 @@ class MainActivity : AppCompatActivity() {
                 val saldoAwal = etSaldoAwalPengguna.text.toString().trim().toDoubleOrNull() ?: 0.0
 
                 val idBaru = dbHelper.tambahPengguna(nama, email, saldoAwal)
-                simpanPenggunaAktif(idBaru)
-                muatUlangSemuaData()
-                Toast.makeText(
-                    this,
-                    "Pengguna baru '$nama' berhasil dibuat & diaktifkan",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (idBaru != -1L) {
+                    simpanPenggunaAktif(idBaru)
+                    muatUlangSemuaData()
+                    Toast.makeText(
+                        this,
+                        "Pengguna baru '$nama' berhasil dibuat & diaktifkan",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Gagal membuat pengguna baru: periksa kembali format email dan saldo",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
                 dialog.dismiss()
+                tampilkanDialogSetelPin()
             }
         }
 

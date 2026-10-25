@@ -77,4 +77,26 @@ object FormatUtils {
         val bulan = cal.get(Calendar.MONTH) // 0..11
         return "${namaHariSingkat[hariMinggu - 1]}, $tanggal ${namaBulanSingkat[bulan]}"
     }
+
+    /**
+     * Menyembunyikan sebagian karakter email untuk melindungi privasi pengguna (OWASP M6)
+     */
+    fun maskEmail(email: String): String {
+        val trimmed = email.trim()
+        val parts = trimmed.split("@")
+        if (parts.size != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+            return trimmed
+        }
+        val user = parts[0]
+        val domain = parts[1]
+        val maskedUser = if (user.length <= 2) {
+            "${user.first()}*"
+        } else {
+            val visibleStart = user.substring(0, 1)
+            val visibleEnd = user.substring(user.length - 1)
+            val stars = "*".repeat(minOf(user.length - 2, 4))
+            "$visibleStart$stars$visibleEnd"
+        }
+        return "$maskedUser@$domain"
+    }
 }
