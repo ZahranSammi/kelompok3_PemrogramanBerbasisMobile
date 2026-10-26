@@ -3,6 +3,7 @@
 Aplikasi mobile Android berbasis **Kotlin** untuk pencatatan dan pengelolaan keuangan pribadi secara cerdas, otomatis, dan terstruktur. Menggunakan database lokal **SQLite** relasional (`pengguna`, `kategori`, `transaksi`) dan antarmuka modern bertema pastel **Lavender** yang responsif terhadap *display cutout* (kamera depan / punch-hole).
 
 ---
+aku suka kalisa
 SI KEREN
 ## Fitur Utama
 
