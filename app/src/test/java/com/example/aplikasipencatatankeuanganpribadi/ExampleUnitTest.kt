@@ -44,4 +44,12 @@ class ExampleUnitTest {
         assertEquals("Oktober 2026", FormatUtils.formatBulanTahun(2026, 10))
         assertEquals("2026-10", FormatUtils.formatPrefixBulan(2026, 10))
     }
+
+    @Test
+    fun maskEmail_isCorrect() {
+        assertEquals("u****3@keuanganpribadi.id", FormatUtils.maskEmail("user123@keuanganpribadi.id"))
+        assertEquals("p****a@domain.com", FormatUtils.maskEmail("pengguna@domain.com"))
+        assertEquals("a*@domain.com", FormatUtils.maskEmail("ab@domain.com"))
+        assertEquals("invalid-email", FormatUtils.maskEmail("invalid-email"))
+    }
 }

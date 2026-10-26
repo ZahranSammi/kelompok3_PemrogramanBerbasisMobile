@@ -96,11 +96,23 @@ class DatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_TRANSAKSI")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_KATEGORI")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PENGGUNA")
-        onCreate(db)
+        // Melindungi data keuangan pengguna dari penghapusan massal saat schema di-upgrade (OWASP A04 Insecure Design)
+        // Hindari DROP TABLE pada lingkungan produksi. Migrasi dilakukan bertahap di sini.
+        if (oldVersion < 2) {
+            // Migrasi masa lalu jika ada
+        }
     }
+
+    private fun escapeLikePattern(input: String): String {
+        return input.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_")
+    }
+
+    private val dateFormatRegex = Regex("^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$")
+    private val emailFormatRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+    private val maxFinancialAmount = 1_000_000_000_000.0 // 1 Triliun Rupiah
+    private val maxTextLength = 255
 
     private fun seedInitialData(db: SQLiteDatabase) {
         // 1. Seed Pengguna Default
@@ -256,28 +268,48 @@ class DatabaseHelper(context: Context) :
     }
 
     fun tambahPengguna(nama: String, email: String, saldoAwal: Double): Long {
-        val db = writableDatabase
-        val cv = ContentValues().apply {
-            put(COL_NAMA_PENGGUNA, nama.trim())
-            put(COL_EMAIL, email.trim())
-            put(COL_SALDO_AWAL, saldoAwal)
+        val namaBersih = nama.trim()
+        val emailBersih = email.trim()
+        if (namaBersih.isBlank() || namaBersih.length > maxTextLength) return -1L
+        if (emailBersih.isNotBlank() && !emailFormatRegex.matches(emailBersih)) return -1L
+        if (!saldoAwal.isFinite() || saldoAwal < 0 || saldoAwal > maxFinancialAmount) return -1L
+
+        return try {
+            val db = writableDatabase
+            val cv = ContentValues().apply {
+                put(COL_NAMA_PENGGUNA, namaBersih)
+                put(COL_EMAIL, if (emailBersih.isNotBlank()) emailBersih else "pengguna@keuanganpribadi.id")
+                put(COL_SALDO_AWAL, saldoAwal)
+            }
+            db.insert(TABLE_PENGGUNA, null, cv)
+        } catch (_: Exception) {
+            -1L
         }
-        return db.insert(TABLE_PENGGUNA, null, cv)
     }
 
     fun updatePengguna(pengguna: Pengguna): Int {
-        val db = writableDatabase
-        val cv = ContentValues().apply {
-            put(COL_NAMA_PENGGUNA, pengguna.namaPengguna.trim())
-            put(COL_EMAIL, pengguna.email.trim())
-            put(COL_SALDO_AWAL, pengguna.saldoAwal)
+        val namaBersih = pengguna.namaPengguna.trim()
+        val emailBersih = pengguna.email.trim()
+        if (namaBersih.isBlank() || namaBersih.length > maxTextLength) return 0
+        if (emailBersih.isNotBlank() && !emailFormatRegex.matches(emailBersih)) return 0
+        if (!pengguna.saldoAwal.isFinite() || pengguna.saldoAwal < 0 || pengguna.saldoAwal > maxFinancialAmount) return 0
+
+        return try {
+            val db = writableDatabase
+            val cv = ContentValues().apply {
+                put(COL_NAMA_PENGGUNA, namaBersih)
+                put(COL_EMAIL, if (emailBersih.isNotBlank()) emailBersih else "pengguna@keuanganpribadi.id")
+                put(COL_SALDO_AWAL, pengguna.saldoAwal)
+            }
+            db.update(
+                TABLE_PENGGUNA,
+                cv,
+                "$COL_ID_PENGGUNA = ?",
+                arrayOf(pengguna.idPengguna.toString())
+            )
+        } catch (_: Exception) {
+            0
         }
-        return db.update(
-            TABLE_PENGGUNA,
-            cv,
-            "$COL_ID_PENGGUNA = ?",
-            arrayOf(pengguna.idPengguna.toString())
-        )
     }
 
     // ==================== OPERASI TABEL KATEGORI ====================
@@ -293,8 +325,8 @@ class DatabaseHelper(context: Context) :
             args.add(filterTipe.name)
         }
         if (!kataKunci.isNullOrBlank()) {
-            conditions.add("$COL_NAMA_KATEGORI LIKE ?")
-            args.add("%${kataKunci.trim()}%")
+            conditions.add("$COL_NAMA_KATEGORI LIKE ? ESCAPE '\\'")
+            args.add("%${escapeLikePattern(kataKunci.trim())}%")
         }
 
         val selection = if (conditions.isNotEmpty()) conditions.joinToString(" AND ") else null
@@ -333,14 +365,23 @@ class DatabaseHelper(context: Context) :
         ikon: String,
         warnaHex: String
     ): Long {
-        val db = writableDatabase
-        val cv = ContentValues().apply {
-            put(COL_NAMA_KATEGORI, namaKategori.trim())
-            put(COL_TIPE_KATEGORI, tipeKategori.name)
-            put(COL_IKON, ikon.ifBlank { if (tipeKategori == TipeTransaksi.PEMASUKAN) "💰" else "🛍️" })
-            put(COL_WARNA, warnaHex)
+        val namaBersih = namaKategori.trim()
+        if (namaBersih.isBlank() || namaBersih.length > 50) return -1L
+        val warnaBersih = if (warnaHex.matches(Regex("^#[0-9a-fA-F]{6}$"))) warnaHex else "#8B5CF6"
+        val ikonBersih = ikon.trim().take(4).ifBlank { if (tipeKategori == TipeTransaksi.PEMASUKAN) "💰" else "🛍️" }
+
+        return try {
+            val db = writableDatabase
+            val cv = ContentValues().apply {
+                put(COL_NAMA_KATEGORI, namaBersih)
+                put(COL_TIPE_KATEGORI, tipeKategori.name)
+                put(COL_IKON, ikonBersih)
+                put(COL_WARNA, warnaBersih)
+            }
+            db.insert(TABLE_KATEGORI, null, cv)
+        } catch (_: Exception) {
+            -1L
         }
-        return db.insert(TABLE_KATEGORI, null, cv)
     }
 
     // ==================== OPERASI TABEL TRANSAKSI ====================
@@ -353,16 +394,24 @@ class DatabaseHelper(context: Context) :
         tanggal: String,
         keterangan: String
     ): Long {
-        val db = writableDatabase
-        val cv = ContentValues().apply {
-            put(COL_FK_PENGGUNA, idPengguna)
-            put(COL_FK_KATEGORI, idKategori)
-            put(COL_TIPE_TRANSAKSI, tipeTransaksi.name)
-            put(COL_JUMLAH, jumlah)
-            put(COL_TANGGAL, tanggal)
-            put(COL_KETERANGAN, keterangan.trim())
+        if (!jumlah.isFinite() || jumlah <= 0 || jumlah > maxFinancialAmount) return -1L
+        if (!dateFormatRegex.matches(tanggal)) return -1L
+        val ketBersih = keterangan.trim().take(maxTextLength)
+
+        return try {
+            val db = writableDatabase
+            val cv = ContentValues().apply {
+                put(COL_FK_PENGGUNA, idPengguna)
+                put(COL_FK_KATEGORI, idKategori)
+                put(COL_TIPE_TRANSAKSI, tipeTransaksi.name)
+                put(COL_JUMLAH, jumlah)
+                put(COL_TANGGAL, tanggal)
+                put(COL_KETERANGAN, ketBersih)
+            }
+            db.insert(TABLE_TRANSAKSI, null, cv)
+        } catch (_: Exception) {
+            -1L
         }
-        return db.insert(TABLE_TRANSAKSI, null, cv)
     }
 
     fun updateTransaksi(
@@ -373,29 +422,41 @@ class DatabaseHelper(context: Context) :
         tanggal: String,
         keterangan: String
     ): Int {
-        val db = writableDatabase
-        val cv = ContentValues().apply {
-            put(COL_FK_KATEGORI, idKategori)
-            put(COL_TIPE_TRANSAKSI, tipeTransaksi.name)
-            put(COL_JUMLAH, jumlah)
-            put(COL_TANGGAL, tanggal)
-            put(COL_KETERANGAN, keterangan.trim())
+        if (!jumlah.isFinite() || jumlah <= 0 || jumlah > maxFinancialAmount) return 0
+        if (!dateFormatRegex.matches(tanggal)) return 0
+        val ketBersih = keterangan.trim().take(maxTextLength)
+
+        return try {
+            val db = writableDatabase
+            val cv = ContentValues().apply {
+                put(COL_FK_KATEGORI, idKategori)
+                put(COL_TIPE_TRANSAKSI, tipeTransaksi.name)
+                put(COL_JUMLAH, jumlah)
+                put(COL_TANGGAL, tanggal)
+                put(COL_KETERANGAN, ketBersih)
+            }
+            db.update(
+                TABLE_TRANSAKSI,
+                cv,
+                "$COL_ID_TRANSAKSI = ?",
+                arrayOf(idTransaksi.toString())
+            )
+        } catch (_: Exception) {
+            0
         }
-        return db.update(
-            TABLE_TRANSAKSI,
-            cv,
-            "$COL_ID_TRANSAKSI = ?",
-            arrayOf(idTransaksi.toString())
-        )
     }
 
     fun hapusTransaksi(idTransaksi: Long): Int {
-        val db = writableDatabase
-        return db.delete(
-            TABLE_TRANSAKSI,
-            "$COL_ID_TRANSAKSI = ?",
-            arrayOf(idTransaksi.toString())
-        )
+        return try {
+            val db = writableDatabase
+            db.delete(
+                TABLE_TRANSAKSI,
+                "$COL_ID_TRANSAKSI = ?",
+                arrayOf(idTransaksi.toString())
+            )
+        } catch (_: Exception) {
+            0
+        }
     }
 
     fun getDaftarTransaksi(
@@ -420,14 +481,14 @@ class DatabaseHelper(context: Context) :
             args.add(filterIdKategori.toString())
         }
         if (!kataKunci.isNullOrBlank()) {
-            conditions.add("(t.$COL_KETERANGAN LIKE ? OR k.$COL_NAMA_KATEGORI LIKE ?)")
-            val pattern = "%${kataKunci.trim()}%"
+            conditions.add("(t.$COL_KETERANGAN LIKE ? ESCAPE '\\' OR k.$COL_NAMA_KATEGORI LIKE ? ESCAPE '\\')")
+            val pattern = "%${escapeLikePattern(kataKunci.trim())}%"
             args.add(pattern)
             args.add(pattern)
         }
         if (!prefixBulan.isNullOrBlank()) {
-            conditions.add("t.$COL_TANGGAL LIKE ?")
-            args.add("$prefixBulan%")
+            conditions.add("t.$COL_TANGGAL LIKE ? ESCAPE '\\'")
+            args.add("${escapeLikePattern(prefixBulan)}%")
         }
 
         val whereClause = conditions.joinToString(" AND ")
@@ -524,8 +585,8 @@ class DatabaseHelper(context: Context) :
             args.add(filterTipe.name)
         }
         if (!prefixBulan.isNullOrBlank()) {
-            conditions.add("t.$COL_TANGGAL LIKE ?")
-            args.add("$prefixBulan%")
+            conditions.add("t.$COL_TANGGAL LIKE ? ESCAPE '\\'")
+            args.add("${escapeLikePattern(prefixBulan)}%")
         }
 
         val whereClause = conditions.joinToString(" AND ")
@@ -664,11 +725,11 @@ class DatabaseHelper(context: Context) :
             val sql = """
                 SELECT $COL_TIPE_TRANSAKSI, SUM($COL_JUMLAH)
                 FROM $TABLE_TRANSAKSI
-                WHERE $COL_FK_PENGGUNA = ? AND $COL_TANGGAL LIKE ?
+                WHERE $COL_FK_PENGGUNA = ? AND $COL_TANGGAL LIKE ? ESCAPE '\\'
                 GROUP BY $COL_TIPE_TRANSAKSI
             """.trimIndent()
 
-            val cursor = db.rawQuery(sql, arrayOf(idPengguna.toString(), "$prefix%"))
+            val cursor = db.rawQuery(sql, arrayOf(idPengguna.toString(), "${escapeLikePattern(prefix)}%"))
             cursor.use {
                 while (it.moveToNext()) {
                     val tipe = TipeTransaksi.fromString(it.getString(0))
